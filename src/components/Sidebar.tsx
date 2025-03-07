@@ -12,7 +12,9 @@ const Sidebar = ({ onSelectKey }: SidebarProps) => {
   const [keys, setKeys] = useState<ChaveObject[]>([])
   const [error, setError] = useState('')
   const [currentPage, setCurrentPage] = useState(0)
-  const itemsPerPage = 5
+  const itemsPerPage = 10
+  const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     const fetchKeys = async () => {
@@ -36,25 +38,44 @@ const Sidebar = ({ onSelectKey }: SidebarProps) => {
     fetchKeys()
   }, [])
 
-  const totalPages = Math.ceil(keys.length / itemsPerPage)
-  const displayedKeys = keys.slice(
+  const filteredKeys = keys.filter((key) =>
+    key.chave.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
+  const totalPages = Math.ceil(filteredKeys.length / itemsPerPage)
+  const displayedKeys = filteredKeys.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage,
   )
 
   const handleSelect = (chave: string) => {
     onSelectKey(chave)
+    setSelectedKey(chave)
+  }
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value)
+    setCurrentPage(0)
   }
 
   return (
     <div className="p-4">
       <h2 className="text-lg font-bold mb-4">Lista de Chaves</h2>
+      <input
+        type="text"
+        placeholder="Buscar chave"
+        className="w-full p-2 mb-4 border rounded"
+        value={searchTerm}
+        onChange={handleSearch}
+      />
       {error && <p className="text-red-500 mb-2">{error}</p>}
       <ul className="space-y-2">
         {displayedKeys.map((item, index) => (
           <li
             key={index}
-            className="p-2 bg-gray-100 rounded cursor-pointer hover:bg-gray-200"
+            className={`p-2 rounded cursor-pointer hover:bg-gray-200 ${
+              selectedKey === item.chave ? 'bg-blue-200' : 'bg-gray-100'
+            }`}
             onClick={() => handleSelect(item.chave)}
           >
             {item.chave}

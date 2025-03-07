@@ -19,7 +19,7 @@ const MessageHistory = ({ messages }: Props) => {
   )
 
   return (
-    <div className="space-y-4">
+    <div className="h-[400px] overflow-y-auto space-y-4 p-2">
       {sortedMessages.map((msg, index) => (
         <MessageCard key={msg.id || index} message={msg} />
       ))}
